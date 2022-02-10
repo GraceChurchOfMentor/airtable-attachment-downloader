@@ -1,9 +1,13 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 require('dotenv').config()
 
 const Airtable = require('airtable');
 const Downloader = require("nodejs-file-downloader");
 const cliProgress = require('cli-progress');
 const c = require('ansi-colors');
+import pLimit from 'p-limit';
 
 (async () => {
   const config = configure()
@@ -14,6 +18,8 @@ const c = require('ansi-colors');
     barsize: 10,
     format: barFormatter,
   }, cliProgress.Presets.shades_grey)
+  const promises = []
+  const limit = pLimit(config.concurrentDownloads)
 
   console.debug(
     c.magenta('Config:'),
@@ -23,7 +29,6 @@ const c = require('ansi-colors');
     "\n  " + c.cyan('Airtable View Name: ') + c.white(config.viewName),
     "\n",
   )
-  const promises = []
 
   gatherRecords(config)
     .then(attachments => {
@@ -34,14 +39,13 @@ const c = require('ansi-colors');
           const pb = multibar.create(100, 0, { filename: attachment.filename });
 
           promises.push(
-            downloadAttachment(attachment.url, attachment.filename, config.attachmentsDir, pb)
-              .then(() => {
-                pb.update(100, { filename: attachment.filename })
-
-                setTimeout(() => {
+            limit(() =>
+              downloadAttachment(attachment.url, attachment.filename, config.attachmentsDir, pb)
+                .then(() => {
+                  pb.update(100, { filename: attachment.filename })
                   pb.stop()
-                }, 200)
-              })
+                })
+            )
           )
 
           if (index === array.length - 1) {
@@ -60,11 +64,13 @@ const c = require('ansi-colors');
 function configure() {
   const defaultConfig = {
     attachmentsDir: './attachments',
+    concurrentDownloads: 5,
     downloadInterval: 100,
     pageSize: 100,
   }
   const config = {
     attachmentsDir: process.env.ATTACHMENTS_DIR ? process.env.ATTACHMENTS_DIR : defaultConfig.attachmentsDir,
+    concurrentDownloads: process.env.CONCURRENT_DOWNLOADS ? parseInt(process.env.CONCURRENT_DOWNLOADS) : defaultConfig.concurrentDownloads,
     downloadInterval: process.env.DOWNLOAD_INTERVAL ? parseInt(process.env.DOWNLOAD_INTERVAL) : defaultConfig.downloadInterval,
     pageSize: process.env.AIRTABLE_PAGE_SIZE ? parseInt(process.env.AIRTABLE_PAGE_SIZE) : defaultConfig.pageSize,
     apiKey: process.env.AIRTABLE_API_KEY,
