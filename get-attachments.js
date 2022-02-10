@@ -66,7 +66,7 @@ function configure() {
   const config = {
     attachmentsDir: process.env.ATTACHMENTS_DIR ? process.env.ATTACHMENTS_DIR : defaultConfig.attachmentsDir,
     downloadInterval: process.env.DOWNLOAD_INTERVAL ? parseInt(process.env.DOWNLOAD_INTERVAL) : defaultConfig.downloadInterval,
-    pageSize: process.env.pageSize ? parseInt(process.env.AIRTABLE_PAGE_SIZE) : defaultConfig.pageSize,
+    pageSize: process.env.AIRTABLE_PAGE_SIZE ? parseInt(process.env.AIRTABLE_PAGE_SIZE) : defaultConfig.pageSize,
     apiKey: process.env.AIRTABLE_API_KEY,
     baseId: process.env.AIRTABLE_BASE_ID,
     baseName: process.env.AIRTABLE_BASE_NAME,
