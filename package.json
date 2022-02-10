@@ -1,0 +1,18 @@
+{
+  "name": "airtable-attachment-downloader",
+  "version": "1.0.0",
+  "main": "get-attachments.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "airtable": "^0.11.1",
+    "ansi-colors": "^4.1.1",
+    "cli-progress": "^3.10.0",
+    "dotenv": "^16.0.0",
+    "nodejs-file-downloader": "^4.9.3"
+  }
+}
