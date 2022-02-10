@@ -4,7 +4,6 @@ const Airtable = require('airtable');
 const Downloader = require("nodejs-file-downloader");
 const cliProgress = require('cli-progress');
 const c = require('ansi-colors');
-const { exit } = require('process');
 
 (async () => {
   const config = configure()
@@ -61,18 +60,18 @@ const { exit } = require('process');
 function configure() {
   const defaultConfig = {
     attachmentsDir: './attachments',
-    downloadInterval: 500,
+    downloadInterval: 100,
     pageSize: 100,
   }
   const config = {
-    attachmentsDir: process.env.ATTACHMENTS_DIR,
+    attachmentsDir: process.env.ATTACHMENTS_DIR ? process.env.ATTACHMENTS_DIR : defaultConfig.attachmentsDir,
+    downloadInterval: process.env.DOWNLOAD_INTERVAL ? parseInt(process.env.DOWNLOAD_INTERVAL) : defaultConfig.downloadInterval,
+    pageSize: process.env.pageSize ? parseInt(process.env.AIRTABLE_PAGE_SIZE) : defaultConfig.pageSize,
     apiKey: process.env.AIRTABLE_API_KEY,
     baseId: process.env.AIRTABLE_BASE_ID,
     baseName: process.env.AIRTABLE_BASE_NAME,
     viewName: process.env.AIRTABLE_VIEW_NAME,
     attachmentFieldName: process.env.AIRTABLE_ATTACHMENT_FIELD_NAME,
-    pageSize: parseInt(process.env.AIRTABLE_PAGE_SIZE),
-    downloadInterval: parseInt(process.env.DOWNLOAD_INTERVAL)
   }
 
   return config
@@ -155,10 +154,4 @@ function barFormatter(options, params, payload) {
   })()
 
   return bar + percent + separator + filename
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }
